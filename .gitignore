@@ -1,0 +1,37 @@
+# dependencies and output
+node_modules/
+dist/
+build/
+coverage/
+.next/
+.cache/
+*.log
+
+# environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.secrets/
+secrets/
+
+# local database and user backups
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-wal
+*.sqlite-shm
+backups/
+dump.sql
+*.dump
+
+# editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+__pycache__/
+*.pyc
