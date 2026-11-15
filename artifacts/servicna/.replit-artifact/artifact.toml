@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "سرفيسنا"
+description = "تطبيق ويب عربي متجاوب يربط ركاب السرافيس في حمص بالسرفيس المناسب على خط الوعر ↔ وسط حمص. الراكب يحدد موقعه ووجهته فيُقترح عليه الاتجاه ونقطة الالتقاء ويرسل طلب ركوب، والسائق يرى الطلبات على خطه واتجاهه ويقبلها ويتابع تأكيد الراكب للصعود، والإدارة تتابع السرافيس والطلبات وتعيد تهيئة بيانات العرض. نموذج أولي للمسابقة ببيانات تجريبية."
+version = "1.0.0"
+id = "artifacts/servicna"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18506
+
+[services.development]
+run = "pnpm --filter @workspace/servicna run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/servicna", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/servicna/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18506"
+BASE_PATH = "/"

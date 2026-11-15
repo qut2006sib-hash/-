@@ -1,0 +1,3 @@
+- [Publishing constraint](publishing-constraint.md) — competition app; do not publish or suggest publishing until the user confirms the "unpublished" rule.
+- [Boarding confirmation meaning](boarding-confirmation-semantics.md) — لا رمز ركوب؛ الراكب يؤكد الصعود، والقرب للتنبيه فقط وليس شرطًا للتأكيد أو إثباتًا ماديًا.
+- [Demo dataset lifetime](idempotency-dataset-lifetime.md) — إفراغ بيانات العرض لا يبدأ نطاق مفاتيح جديدًا؛ تكرار reset قديم يجب ألا يمس بيانات أحدث.
