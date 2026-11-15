@@ -1,0 +1,65 @@
+name: Import Sarvisna source snapshot
+on:
+  push:
+    branches: [main]
+    paths:
+      - archive/srfysn-source-clean.zip
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Verify and import Replit source
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'd47be64e7918924395448db0d992099d36189887fb48796e94801e956da1f43c  archive/srfysn-source-clean.zip' | sha256sum -c -
+          if unzip -Z1 archive/srfysn-source-clean.zip | grep -Eq '(^/|(^|/)\.\.(/|$))'; then
+            echo 'Unsafe ZIP paths detected' >&2
+            exit 1
+          fi
+          unzip -oq archive/srfysn-source-clean.zip -d .
+          for file in package.json pnpm-lock.yaml artifacts/servicna/src/App.tsx artifacts/api-server/src/app.ts lib/db/src/schema/servicna.ts lib/api-spec/openapi.yaml; do
+            test -f "$file" || { echo "Missing source file: $file" >&2; exit 1; }
+          done
+          cat >> .gitignore <<'IGNORE'
+
+          # Additional safeguards for local credentials and data
+          .env
+          .env.*
+          !.env.example
+          *.sqlite
+          *.sqlite3
+          *.db
+          *.pem
+          *.key
+          backups/
+          IGNORE
+          cat > docs/SOURCE_RECOVERY.md <<'DOC'
+          # استعادة سورس سرفيسنا
+
+          في 15 تشرين الثاني 2026 تم استلام أرشيف مصدر Replit، وفحصه وتجهيزه للاستيراد.
+
+          ## النسخة المستعادة
+          - 303 ملفات Git متتبَّعة في المراجعة 71fdfd9 من المشروع الأصلي، دون مجلد Git الخاص ببيئة Replit.
+          - واجهة React، خادم API، تعريفات وترحيلات قاعدة البيانات، اختبارات، وثائق المشروع وملفات إعداد pnpm.
+          - الأرشيف المنظف متاح في `archive/srfysn-source-clean.zip` للتحقق من البصمة SHA-256.
+          - ملفات `.git` القديمة ومخرجات البناء و`attached_assets` غير المتتبعة لم تُرفع.
+
+          **التحقق:** نجح فحص محتويات الأرشيف وتحقق البصمة. تنفيذ الاختبارات وبناء التطبيق على GitHub لم يُتحقق منه بعد. لا تضع بيانات ركاب حقيقية أو أسرار تشغيل داخل المستودع العام.
+          DOC
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Source snapshot is already imported'
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Import original Sarvisna Replit source (303 files)'
+          git push origin HEAD:main
